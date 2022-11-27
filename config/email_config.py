@@ -1,9 +1,9 @@
-email="APP_EMAIL"
-password="APP_PASSWORD"
+email="aman3sbhadoria@gmail.com"
+password="toyiazobmouiubju"
 
 # Time is in minutes
-time_to_delete_min = "TIME_TO_DELETE(INTEGER)"
+time_to_delete_min = 5
 # Host name to send mail
-host_name = 'APP_HOST_NAME'
+host_name = 'smtp.gmail.com'
 
 
