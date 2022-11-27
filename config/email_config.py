@@ -4,6 +4,6 @@ password="toyiazobmouiubju"
 # Time is in minutes
 time_to_delete_min = 5
 # Host name to send mail
-host_name = 'https://adm-private-manager.herokuapp.com/'
+host_name = 'adm-private-manager.herokuapp.com'
 
 
