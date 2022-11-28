@@ -1,25 +1,20 @@
 from config import email_config
-from Cassandra import Cassandra
+from Connect_Database import Connect_Database
 from Download import Download
 from Scrapper import ImageScrapperClass
 from Logger import Logging
 from Email import SendEmail
 
-logger_obj = Logging('Advance Image Downloader')  # Creating a custom based logger
-logger_obj.initialize_logger()  # Instantiating the logger object
+logger_ins = Logging('Advance Image Extractor')  # Creating an instance of custom logger
+logger_ins.initialize_logger()  # Instantiating the logger instance
 
 
 class HelperClass:
 
     def helper_image(self, search_query, no_images, email, req_id, schedule_job):
-        """
-        this helper method responsible for calling the respective methods for inserting the images into the database
-        :param search_query: Search query given by user
-        :param no_images: Number of images to download
-        :param email: Email of the user
-        :param req_id: Unique request ID of the user
-        :param schedule_job: scheduler object
-        """
+        
+        # this helper method responsible for calling the respective methods for inserting the images into the database
+    
         try:
             # Send email about job starts execution
             message = 'Subject: {}\n\n{}'.format('Job scheduling started',
@@ -30,7 +25,7 @@ class HelperClass:
             self.helper_email(email, str(req_id), search_query, message)
 
             # Initializing the cassandra database object
-            cassandra = Cassandra()
+            cassandra = Connect_Database()
 
             # Connecting to the default keyspace
             cassandra.connect_keyspace()
@@ -50,7 +45,7 @@ class HelperClass:
             self.helper_download(email, search_query, req_id, schedule_job, cassandra)
 
         except Exception as e:
-            logger_obj.print_log('(HelperClass.py(helper_image) - Something went wrong ' + str(e), 'exception')
+            logger_ins.print_log('(HelperClass.py(helper_image) - Something went wrong ' + str(e), 'exception')
 
             # Sending the error message
             error_message = 'Subject: Error in job\n\nThere is some error occurred while performing your job ' \
@@ -63,13 +58,9 @@ class HelperClass:
 
     @staticmethod
     def helper_email(email, req_id=None, search_query=None, message=None):
-        """
-        This helper method is responsible for calling methods for sending an email
-        :param email: Email address of  the receiver
-        :param reqs_id: Unique request ID
-        :param search_query: Search query of the user
-        :param message: Message to be sent
-        """
+        
+        # This helper method is responsible for calling methods for sending an email
+        
         try:
             if not message:
                 message = 'Subject: Your Images are Downloaded\n\nKindly download your images through the following ' \
@@ -83,64 +74,58 @@ class HelperClass:
             email_obj.send_notification(email, message)
 
         except Exception as e:
-            logger_obj.print_log('(HelperClass.py(helper_email) - Something went wrong ' + str(e), 'exception')
+            logger_ins.print_log('(HelperClass.py(helper_email) - Something went wrong ' + str(e), 'exception')
             raise Exception(e)
 
     @staticmethod
     def helper_delete(req_id):
-        """
-        This helper method is responsible for calling the methods to delete the files after some amount of time
-        :param req_id: Unique request ID
-        """
+
+        # This helper method is responsible for calling the methods to delete the files after some amount of time
+        
         try:
             print("Delete operation started")
-            logger_obj.print_log('Deleting operation started', 'info')
+            logger_ins.print_log('Deleting operation started', 'info')
 
             # Deleting the files from the system
             Download.delete_file(req_id)
 
-            logger_obj.print_log('All the files are deleted', 'info')
+            logger_ins.print_log('All the files are deleted', 'info')
             print("All the files are deleted now")
 
             # Initializing the cassandra database object
-            cassandra = Cassandra()
-            logger_obj.print_log('Connected to the cassandra', 'info')
+            cassandra = Connect_Database()
+            logger_ins.print_log('Connected to the cassandra', 'info')
             print('Connected to the cassandra')
             # Connecting to the default keyspace
             cassandra.connect_keyspace()
             # Deleting the database records
             cassandra.delete_url(req_id)
-            logger_obj.print_log('Delete operation from cassandra is done', 'info')
+            logger_ins.print_log('Delete operation from cassandra is done', 'info')
             print('Delete operation from the cassandra is done')
 
         except Exception as e:
-            logger_obj.print_log('(HelperClass.py(helper_delete) - Something went wrong ' + str(e), 'exception')
+            logger_ins.print_log('(HelperClass.py(helper_delete) - Something went wrong ' + str(e), 'exception')
             raise Exception(e)
 
     def helper_download(self, email, search_query, req_id, schedule_job, cassandra=None):
-        """
-        This helper method is responsible for calling the methods to download the images over an internet
-        :param email: Email address of  the receiver
-        :param search_query: Search query of the user
-        :param req_id: Unique request ID
-        :param schedule_job: SchedulerClass object
-        :param cassandra: Cassandra object
-        """
+        
+        # This helper method is responsible for calling the methods to download the images over an internet
+    
         try:
-            logger_obj.print_log('Inside the download function', 'info')
+            logger_ins.print_log('Inside the download function', 'info')
 
             # Initializing the cassandra database object
             if not cassandra:
-                cassandra = Cassandra()
+                cassandra = Connect_Database()
                 # Connecting to the default keyspace
                 cassandra.connect_keyspace()
-                logger_obj.print_log('Connection to the database established', 'info')
+                logger_ins.print_log('Connection to the database established', 'info')
 
             # First check whether the req_id exists in the database
             result = cassandra.select_query(req_id)
 
             if result:
-                logger_obj.print_log('Result is found', 'info')
+                logger_ins.print_log('Result is found', 'info')
 
                 # Creating the download class object for performing download operations
                 download_obj = Download(result)
@@ -148,16 +133,16 @@ class HelperClass:
                 str_req_id = str(req_id)
 
                 # Creating directory for saving images
-                Download.create_dir(str_req_id)
-                logger_obj.print_log('Directory is created', 'info')
+                Download.create_folder(str_req_id)
+                logger_ins.print_log('Folder is created', 'info')
 
                 # Downloading Images
                 download_obj.download_images(search_query, str_req_id)
-                logger_obj.print_log('Images are downloaded over the internet', 'info')
+                logger_ins.print_log('Images are downloaded over the internet', 'info')
 
                 # Creating a zip file
                 Download.create_zip(str_req_id)
-                logger_obj.print_log('Zip file is created', 'info')
+                logger_ins.print_log('Zip file is created', 'info')
 
                 # Calling the delete_files function
                 schedule_job.delete_files_job_queue(str_req_id, email_config.time_to_delete_min)
@@ -165,9 +150,9 @@ class HelperClass:
                 # Sending the mail
                 self.helper_email(email, str_req_id, search_query)
             else:
-                logger_obj.print_log('(app.py) - Something went wrong You are not allowed to access', 'exception')
+                logger_ins.print_log('(app.py) - Something went wrong You are not allowed to access', 'exception')
                 raise Exception('You are not allowed to access or the Link has expired')
 
         except Exception as e:
-            logger_obj.print_log('(app.py) - Something went wrong You are not allowed to access', 'exception')
+            logger_ins.print_log('(app.py) - Something went wrong You are not allowed to access', 'exception')
             raise Exception(e)

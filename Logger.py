@@ -4,10 +4,9 @@ from config import log_config
 
 class Logging:
     def __init__(self, name):
-        """
-        Function is used to instantiate the custom logger
-        :param name: custom name for the logger
-        """
+        
+        # Function is used to instantiate the custom logger
+       
         try:
             # Creating Custom Logger
             self.logger = logging.getLogger(name)
@@ -16,9 +15,9 @@ class Logging:
             raise Exception(e)
 
     def initialize_logger(self):
-        """
-        This function adds the custom formatters and handlers to the logger object
-        """
+        
+        # This function adds the custom formatters and handlers to the logger object
+       
         try:
             if len(self.logger.handlers) == 0:
 
@@ -47,11 +46,9 @@ class Logging:
             raise Exception(e)
 
     def print_log(self, log_statement, log_level):
-        """
-        This function is use for printing and logging the statements
-        :param log_statement: Statement for logging
-        :param log_level : Level of log that needs to be maintained
-        """
+       
+       # This function is use for printing and logging the statements
+      
         try:
             if log_level == 'info':
                 self.logger.info(log_statement)

@@ -8,8 +8,8 @@ from Helper import HelperClass
 from Logger import Logging
 
 # Configuring the logger
-logger_obj = Logging('Advance Image Downloader')  # Creating a custom based logger
-logger_obj.initialize_logger()  # Instantiating the logger object
+logger_ins = Logging('Advance Image Extractor')  # Creating an instance of custom logger
+logger_ins.initialize_logger()  # Instantiating the logger instance
 
 # Creating a scheduler object for scheduling the jobs
 ap_scheduler = BackgroundScheduler(jobstores=scheduler_config.jobstores, executors=scheduler_config.executors,
@@ -23,26 +23,19 @@ class ScheduleJob:
     global ap_scheduler
 
     def __init__(self):
-        """
-        This function initializes the Scheduler object
-        :param ap_scheduler(object): apscheduler object
-        """
+        
+        # This function initializes the Scheduler object
+       
         try:
             self.scheduler = ap_scheduler
         except Exception as e:
-            logger_obj.print_log('(Scheduler.py(__init__) - Something went wrong ' + str(e), 'exception')
+            logger_ins.print_log('(Scheduler.py(__init__) - Something went wrong ' + str(e), 'exception')
             raise Exception(e)
 
     def insert_request(self, search_query, date, time, no_images, email, req_id):
-        """
-        This function adds the current request into the queue for processing
-        :param search_query: Search query given by the user
-        :param date: Date at which job must run
-        :param time: Time at which job must run
-        :param no_images: No of images user wants
-        :param email: email of the user
-        :param req_id: Unique Request Id of the request
-        """
+        
+        # This function adds the current request into the queue for processing
+        
         try:
             # Splitting the values for inserting into proper date and time format
             date_list = date.split('-')
@@ -67,22 +60,19 @@ class ScheduleJob:
                                        year=year, hour=hour, minute=minute, id=str(req_id))
 
             else:
-                logger_obj.print_log(
+                logger_ins.print_log(
                     '(Scheduler.py(schedule_job) - Something went wrong. You have insert the past date and time',
                     'exception')
                 raise Exception("You have inserted the past date and time")
 
         except Exception as e:
-            logger_obj.print_log('(Scheduler.py(schedule_job) - Something went wrong. Inputs might be invalid' + str(e), 'exception')
+            logger_ins.print_log('(Scheduler.py(schedule_job) - Something went wrong. Inputs might be invalid' + str(e), 'exception')
             raise Exception('Inputs might be invalid')
 
     def delete_files_job_queue(self, req_id, time_to_delete):
-        """
-        This function is responsible for deleting the folder, zip files which are created to handle the request
-        :param req_id: Unique request ID
-        :param time_to_delete: Time to delete after
-        :return:
-        """
+        
+        # This function is responsible for deleting the folder, zip files which are created to handle the request
+       
         try:
             current_date = datetime.datetime.now(tz.gettz('Asia/Kolkata'))  # Getting the current datetime value
             delete_time = current_date + datetime.timedelta(minutes=time_to_delete)  # Time to delete the files
@@ -91,5 +81,5 @@ class ScheduleJob:
                                    month=delete_time.month, year=delete_time.year,
                                    hour=delete_time.hour, minute=delete_time.minute, id=str(req_id))
         except Exception as e:
-            logger_obj.print_log('(Scheduler.py(delete_files_job_queue) - Something went wrong ' + str(e), 'exception')
+            logger_ins.print_log('(Scheduler.py(delete_files_job_queue) - Something went wrong ' + str(e), 'exception')
             raise Exception(e)

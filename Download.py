@@ -4,41 +4,40 @@ import shutil
 
 from Logger import Logging
 
-logger_obj = Logging('Advance Image Downloader')  # Creating a custom based logger
-logger_obj.initialize_logger()  # Instantiating the logger object
+logger_ins = Logging('Advance Image Extractor')  # Creating an instance of custom logger
+logger_ins.initialize_logger()  # Instantiating the logger instance
 
 
 class Download:
 
     def __init__(self, result=None):
-        """
-        This function initializes the content of the downloaded files
-        :param result: Cassandra object of the downloadable result content
-        """
+       
+        # This function initializes the content of the downloaded files
+
         try:
             self.content = result
         except Exception as e:
-            logger_obj.print_log('(Download.py(__init__) - Something went wrong ' + str(e), 'exception')
+            logger_ins.print_log('(Download.py(__init__) - Something went wrong ' + str(e), 'exception')
             raise Exception(e)
 
     @staticmethod
-    def create_dir(req_id):
-        """
-        This function is used to create a directory for storing the images
-        """
+    def create_folder(req_id):
+       
+       # This function is used to create a folder for storing the images
+     
         try:
             # If the folder doesn't exist then create that folder inside the directory
             if not os.path.exists(req_id):
                 os.mkdir(req_id)
 
         except Exception as e:
-            logger_obj.print_log('(Download.py(create_dir) - Something went wrong ' + str(e), 'exception')
+            logger_ins.print_log('(Download.py(create_dir) - Something went wrong ' + str(e), 'exception')
             raise Exception(e)
 
     def download_images(self, search_term, req_id):
-        """
-        This function is used to download the images over the internet and then store in the folder created
-        """
+        
+        # This function is used to download the images over the internet and then store in the folder created
+     
         try:
             counter = 1
             for row in self.content:
@@ -48,7 +47,7 @@ class Download:
                                                                             "Chrome/51.0.2704.103 Safari/537.36"})
                 print('Counter = {} Header = {} URL = {}'.format(counter, req.headers, url))
 
-                logger_obj.print_log('Filetype is {}'.format(req.headers['Content-Type'].split('/')[1]), 'info')
+                logger_ins.print_log('Filetype is {}'.format(req.headers['Content-Type'].split('/')[1]), 'info')
 
                 filetype = req.headers['Content-Type'].split('/')[1].split(';')[0]
 
@@ -63,29 +62,27 @@ class Download:
                     counter += 1
 
         except Exception as e:
-            logger_obj.print_log('(Download.py(download_images) - Something went wrong ' + str(e), 'exception')
+            logger_ins.print_log('(Download.py(download_images) - Something went wrong ' + str(e), 'exception')
             raise Exception(e)
 
     @staticmethod
     def create_zip(req_id):
-        """
-        This function will be responsible for creating the zip file of the Downloaded Images folder
-        :param req_id : The Unique id of the request
-        """
+        
+        # This function will be responsible for creating the zip file of the Downloaded Images folder
+    
         try:
             if not os.path.exists(req_id + '_zipfile.zip'):
                 shutil.make_archive(req_id + '_zipfile', 'zip', req_id)
 
         except Exception as e:
-            logger_obj.print_log('(Download.py(create_zip) - Something went wrong ' + str(e), 'exception')
+            logger_ins.print_log('(Download.py(create_zip) - Something went wrong ' + str(e), 'exception')
             raise Exception(e)
 
     @staticmethod
     def delete_file(req_id):
-        """
-        This function will delete the given files
-        :param req_id: The Unique id of the request
-        """
+        
+        # This function will delete the given files
+        
         try:
             # If the zip exists then remove that from the system
             if os.path.exists(req_id + '_zipfile.zip'):
@@ -98,5 +95,5 @@ class Download:
                 print('Image Folder is deleted')
 
         except Exception as e:
-            logger_obj.print_log('(Download.py(delete_old_file) - Something went wrong ' + str(e), 'exception')
+            logger_ins.print_log('(Download.py(delete_old_file) - Something went wrong ' + str(e), 'exception')
             raise Exception(e)
